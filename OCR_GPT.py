@@ -23,7 +23,11 @@ FYI: To see all system environment variables,
 
 -----------------------------------------------------------------------------------   
 https://blog.roboflow.com/gpt-4-image-classification/   
-On November 6th, 2023, OpenAI released a vision-enabled version of the GPT-4 API. This API, referred to by the gpt-4-vision-preview identifier, enables you to ask a question and provide an image as context. We previously reported on GPT 4V's capabilities, noting impressive performance in image understanding. These capabilities are perfect for classification.
+On November 6th, 2023, OpenAI released a vision-enabled version of the GPT-4 API. 
+This API, referred to by the gpt-4-vision-preview identifier,
+enables you to ask a question and provide an image as context. 
+We previously reported on GPT 4V's capabilities, noting impressive performance in image understanding. 
+These capabilities are perfect for classification.
 
 
 """
@@ -39,18 +43,69 @@ client = OpenAI(api_key=my_api_key)   # openai version 1.1.1
 try:
 
     # "gpt-3.5-turbo", currently points to gpt-3.5-turbo-0613. Will point to gpt-3.5-turbo-1106 starting Dec 11, 2023. 
+    
+    """
     # post https://api.openai.com/v1/chat/completions
     completion = client.chat.completions.create(
-    model="gpt-4",
-
-    # Grammar correction
-    messages=[
-        {"role": "system", "content": "You will be provided with statements, and your task is to convert them to standard English."},
-        {"role": "user", "content": "She no went to the market."}
-    ]
+        model="gpt-4", # we want "gpt-4-vision-preview"
+        # Grammar correction
+        messages=[
+            {"role": "system", "content": "You will be provided with statements, and your task is to convert them to standard English."},
+            {"role": "user", "content": "She no went to the market."}
+            ]
     )
 
+    # Works
     print(completion.choices[0].message)
+    """
+
+    """
+    # post https://api.openai.com/v1/images/generations
+    completion = client.images.generate(
+        model="dall-e-3", 
+        # Creates an image given a prompt.
+        prompt="A cute baby sea otter",
+        n=1,
+        size="1024x1024",
+        quality="standard"
+    )
+
+    image_url = completion.data[0].url
+    # Works
+    print(image_url)
+ 
+    """
+
+    # So we are told the OCR is part of chat completetion
+
+
+
+    request = "Please OCR this image."
+    test_url = "https://metalbyexample.com/wp-content/uploads/figure-65.png"
+
+    completion = client.chat.completions.create(
+        model="gpt-4-vision-preview",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": request},
+                    {
+                        "type": "image_url",
+                        "image_url": test_url
+                    }
+                ]
+            }  
+        ],
+        max_tokens=300,  
+    )
+    """
+    Choice(finish_reason=None, index=0, 
+    message=ChatCompletionMessage(content='The image contains the following text:\n\n"It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness..."', role='assistant', function_call=None, tool_calls=None), finish_details={'type': 'stop', 'stop': '<|fim_suffix|>'})
+    """
+
+
+    print(completion.choices[0])
 
 except Exception as ex:
     print("Exception:", ex)
