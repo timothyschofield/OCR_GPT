@@ -24,11 +24,11 @@ FYI: To see all system environment variables,
 -----------------------------------------------------------------------------------   
 https://blog.roboflow.com/gpt-4-image-classification/   
 On November 6th, 2023, OpenAI released a vision-enabled version of the GPT-4 API. 
+
 This API, referred to by the gpt-4-vision-preview identifier,
 enables you to ask a question and provide an image as context. 
 We previously reported on GPT 4V's capabilities, noting impressive performance in image understanding. 
 These capabilities are perfect for classification.
-
 
 """
 import os
@@ -43,7 +43,6 @@ client = OpenAI(api_key=my_api_key)   # openai version 1.1.1
 try:
 
     # "gpt-3.5-turbo", currently points to gpt-3.5-turbo-0613. Will point to gpt-3.5-turbo-1106 starting Dec 11, 2023. 
-    
     """
     # post https://api.openai.com/v1/chat/completions
     completion = client.chat.completions.create(
@@ -76,10 +75,6 @@ try:
  
     """
 
-    # So we are told the OCR is part of chat completetion
-
-
-
     request = "Please OCR this image."
     test_url = "https://metalbyexample.com/wp-content/uploads/figure-65.png"
 
@@ -101,9 +96,8 @@ try:
     )
     """
     Choice(finish_reason=None, index=0, 
-    message=ChatCompletionMessage(content='The image contains the following text:\n\n"It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness..."', role='assistant', function_call=None, tool_calls=None), finish_details={'type': 'stop', 'stop': '<|fim_suffix|>'})
+    message=ChatCompletionMessage(content='Sure, the text in the image reads:\n\n```\nIt was the best of\ntimes, it was the worst\nof times, it was the age\nof wisdom, it was the\nage of foolishness...\n```', role='assistant', function_call=None, tool_calls=None), finish_details={'type': 'stop', 'stop': '<|fim_suffix|>'})
     """
-
 
     print(completion.choices[0])
 
