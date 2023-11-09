@@ -26,7 +26,7 @@ import os
 # This code is for v1 of the openai package: pypi.org/project/openai
 # pip install openai
 from openai import OpenAI
-
+ 
 my_api_key = os.environ["OPENAI_API_KEY"]
 
 client = OpenAI(api_key=my_api_key)   # openai version 1.1.1

@@ -15,7 +15,7 @@ Click it to open the side bar and click "API keys".
 
 Then in the Terminal type
     "setx OPENAI_API_KEY <the openai key>"
-
+ 
 WARNING: You have to quit out of VS Code (this IDE) and go back in before the new system environment variables are avaliable
 
 FYI: To see all system environment variables,
