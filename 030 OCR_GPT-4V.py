@@ -53,10 +53,21 @@ try:
     # https://platform.openai.com/docs/guides/vision
     # https://help.openai.com/en/articles/8555496-gpt-v-api
 
-    request = "Please OCR this hebarium lable and extract collector and collector number, altitude, latitude, longitude, location, country, description, language and the barcode number which begins with the letter 'K'"
+    request = "Please OCR this hebarium lable and extract collector and collector number, date, family, genus, species, altitude, latitude, longitude, location, country, description, language and the barcode number which begins with the letter 'K'"
+    # test_url = "https://d2seqvvyy3b8p2.cloudfront.net/d1f65c385d649f6770035348dd05c7ee.jpg" # shit handwritten
     
-    test_url = "https://d2seqvvyy3b8p2.cloudfront.net/17ab52f8bf423934e72f326506e26850.jpg"
+    test_url = "https://d2seqvvyy3b8p2.cloudfront.net/2ca62a26221a397d6942874b6ee7a225.jpg" # better handwritting
 
+    #test_url = "https://d2seqvvyy3b8p2.cloudfront.net/17ab52f8bf423934e72f326506e26850.jpg" # printed
+    
+
+   
+    
+
+    #request = "Please OCR this old handwriting"
+    #test_url = "https://c7.alamy.com/comp/MF9K2X/facsimile-of-a-portion-of-the-letter-written-by-oliver-cromwell-to-william-lenthall-speaker-of-the-house-of-commons-announcing-the-victory-at-the-battle-of-naseby-in-1645-from-old-england-a-pictorial-museum-published-1847-MF9K2X.jpg"
+    
+    
     ocr_output = client.chat.completions.create(
         model="gpt-4-vision-preview",
         messages=[
@@ -75,39 +86,61 @@ try:
     )
     
     # Works
-    # print(ocr_output.choices[0].message)
+    print(ocr_output.choices[0].message)
    
     json_output = client.chat.completions.create(
         model="gpt-4", 
         # Grammar correction
         messages=[
-            {"role": "system", "content": "First, delete all occurances of '\n  '. Format this as JSON where 'Collector', 'Altitude', 'Location', 'Country', 'Description' and 'Barcode number' are keys"},
-            
-            # {"role": "system", "content": "First, delete all occurances of '\n  '. Format this as an SQL INSERT statement where 'Collector', 'Altitude', 'Location', 'Country', 'Description' and 'Barcode number' are columns"},
-            
+            {"role": "system", "content": "First, delete all occurances of '\n  '. Format this as JSON where 'Collector', 'Collector number', Date, 'Family', 'Genus', 'Species','Altitude', 'Location', 'Latitude', 'Longitude', 'Country', 'Description' and 'Barcode number' are keys"},
             {"role": "user", "content": str(ocr_output.choices[0].message)}
             ]
     )
 
     print(json_output.choices[0].message.content)
+
     """
     {
-    "Collector": "P. S. Lavarack",
+    "Collector": "P.S. Lavarack",
     "Collector number": "PSL4001",
-    "Altitude": "2 m",
+    "Altitude": "2 m.",
+    "Location": "12km S of Cardwell, W of highway near Cleghorn",
     "Latitude": "18°23'S",
     "Longitude": "146°05'E",
-    "Location": "12km S of Cardwell, W of highway near clearing",
-    "Country": "Australia",
-    "Description": "Habenaria praecox Lavarack & Dockrill, Herbaceous viridiflora woodland, poorly drained. Type specimen",
-    "Language": "English",
-    "Barcode number": "The barcode appears to be obscured in the image provided, and without a clear view, I cannot accurately identify the barcode number that begins with a 'K.'"
+    "Country": "Queensland, Australia",
+    "Description": "Herbaceous viviform woodland, poorly drained. Male to about 40cm tall.",
+    "Barcode number": "K000742667"
     }
-
     """
 
+    sql_output = client.chat.completions.create(
+        model="gpt-4", 
+        # Grammar correction
+        messages=[
+            {"role": "system", "content": "This input is JSON. Format the input as an SQL INSERT statement for a table named 'specimenCards' where the keys are the column names and the values are values"},
+            {"role": "user", "content": str(json_output.choices[0].message.content)}
+            ]
+    )
 
+    print(sql_output.choices[0].message.content)
 
+    """
+    {
+    "Collector": "P.S. Lavarack",
+    "Collector number": "PSL4001",
+    "Altitude": "2 m.",
+    "Location": "12km S of Cardwell, W of highway near Cleghorn",
+    "Latitude": "18°23'S",
+    "Longitude": "146°05'E",
+    "Country": "Queensland, Australia",
+    "Description": "Herbaceous viviform woodland, poorly drained. Male to about 40cm tall.",
+    "Barcode number": "K000742667"
+    }
+
+    INSERT INTO specimenCards (Collector, Collector number, Altitude, Location, Latitude, Longitude, Country, Description, Barcode number) 
+    VALUES ('P.S. Lavarack', 'PSL4001', '2 m.', '12km S of Cardwell, W of highway near Cleghorn', '18°23''S', '146°05''E', 'Queensland, Australia', 'Herbaceous viviform woodland, poorly drained. Male to about 40cm tall.', 'K000742667');
+
+    """
 except Exception as ex:
     print("Exception:", ex)
 
